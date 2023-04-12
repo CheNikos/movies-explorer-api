@@ -18,16 +18,16 @@ router.post('/movies', celebrate({
     duration: Joi.number().required(),
     year: Joi.string().required(),
     description: Joi.string().required(),
-    image: Joi.string().required().pattern(URL_CHECK),
-    trailer: Joi.string().required().pattern(URL_CHECK),
+    image: Joi.string().required().regex(URL_CHECK),
+    trailerLink: Joi.string().required().regex(URL_CHECK),
+    thumbnail: Joi.string().required().regex(URL_CHECK),
+    movieId: Joi.number().required(),
     nameRU: Joi.string().required(),
     nameEN: Joi.string().required(),
-    thumbnail: Joi.string().required().pattern(URL_CHECK),
-    movieId: Joi.required(),
   }),
 }), createMovie);
 
-router.delete('/movies/_id', celebrate({
+router.delete('/movies/:movieId', celebrate({
   params: Joi.object().keys({
     movieId: Joi.string().length(24).hex().required(),
   }),

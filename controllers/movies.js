@@ -20,8 +20,9 @@ const createMovie = (req, res, next) => {
     image,
     trailerLink,
     thumbnail,
-    nameRU,
+    movieId,
     nameEN,
+    nameRU,
   } = req.body;
   const owner = req.user._id;
 
@@ -35,8 +36,9 @@ const createMovie = (req, res, next) => {
       image,
       trailerLink,
       thumbnail,
-      nameRU,
+      movieId,
       nameEN,
+      nameRU,
       owner,
     })
     .then((movie) => res.status(201).send(movie))
@@ -55,8 +57,8 @@ const deleteMovie = (req, res, next) => {
     .orFail(() => {
       throw new NotFoundErr('Фильм с указанным id не найден');
     })
-    .then((card) => {
-      movieSchema.deleteOne(card)
+    .then((movie) => {
+      movieSchema.deleteOne(movie)
         .then(() => { res.send({ message: 'Фильм удален' }); })
         .catch(next);
     })
