@@ -58,7 +58,7 @@ const login = (req, res, next) => {
 const getCurrentUser = (req, res, next) => {
   userSchema.findById(req.user._id)
     .then((user) => {
-      if (user) return res.send(user);
+      if (user) return res.status(200).send(user);
 
       throw new NotFoundErr('Пользователь с таким id не найден');
     })
