@@ -3,22 +3,15 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const helmet = require('helmet');
-const { celebrate, Joi, errors } = require('celebrate');
+const { errors } = require('celebrate');
+const router = require('./routes');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-
-const { login, createUser } = require('./controllers/users');
-
 const corsErr = require('./middlewares/cors');
 
 const app = express();
 app.use(cors());
 app.use(helmet());
 app.use(express.json());
-
-const auth = require('./middlewares/auth');
-const routeUsers = require('./routes/users');
-const routeMovies = require('./routes/movies');
-const NotFoundErr = require('./errors/NotFoundErr');
 
 app.use(corsErr);
 mongoose.connect('mongodb://127.0.0.1:27017/bitfilmsdb');
@@ -33,29 +26,7 @@ app.get('/crash-test', () => {
   }, 0);
 });
 
-app.post('/signin', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required(),
-  }),
-}), login);
-
-app.post('/signup', celebrate({
-  body: Joi.object().keys({
-    name: Joi.string().min(2).max(30).required(),
-    email: Joi.string().required().email(),
-    password: Joi.string().required(),
-  }),
-}), createUser);
-
-app.use(auth);
-
-app.use(routeUsers);
-app.use(routeMovies);
-
-app.use((req, res, next) => {
-  next(new NotFoundErr('Такой страницы не существует'));
-});
+app.use(router);
 
 app.use(errorLogger);
 
