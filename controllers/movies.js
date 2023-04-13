@@ -1,10 +1,11 @@
 const movieSchema = require('../models/movie');
 const BadRequestErr = require('../errors/BadRequestErr');
 const NotFoundErr = require('../errors/NotFoundErr');
+const ForbiddenErr = require('../errors/ForbiddenErr');
 
 const getMovies = (req, res, next) => {
   movieSchema
-    .find({})
+    .find({ owner: req.user._id })
     .populate(['owner'])
     .then((movies) => res.send(movies))
     .catch(next);
@@ -58,9 +59,14 @@ const deleteMovie = (req, res, next) => {
       throw new NotFoundErr('Фильм с указанным id не найден');
     })
     .then((movie) => {
-      movieSchema.deleteOne(movie)
-        .then(() => { res.send({ message: 'Фильм удален' }); })
-        .catch(next);
+      const owner = movie.owner.toString();
+      if (req.user._id === owner) {
+        movieSchema.deleteOne(movie)
+          .then(() => { res.send({ message: 'Фильм удален' }); })
+          .catch(next);
+      } else {
+        throw new ForbiddenErr('Чужой фильм не может быть удален');
+      }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
